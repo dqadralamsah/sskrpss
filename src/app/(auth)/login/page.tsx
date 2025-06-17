@@ -1,4 +1,4 @@
-import FormSignIn from '@/components/auth/form-sign-in';
+import FormLogin from '@/components/auth/formLogin';
 
 const SignInPage = () => {
   return (
@@ -9,7 +9,7 @@ const SignInPage = () => {
           We missed you! please enter your details
         </h3>
       </div>
-      <FormSignIn />
+      <FormLogin />
     </div>
   );
 };

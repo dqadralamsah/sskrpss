@@ -5,16 +5,30 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const session = await auth();
 
-  if (pathname === '/login') {
-    if (session) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
+  const publicPath = ['/login', '/unauthorized'];
+  const isPublic = publicPath.includes(pathname);
+
+  // Not Session and Not Login
+  if (!session && !isPublic) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  const protectedRoutes = ['/dashboard'];
-  if (protectedRoutes.includes(pathname)) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/login', request.url));
+  // Loggedin user tries to access public pages
+  if (session && isPublic) {
+    const role = session.user.role.toLowerCase();
+
+    return NextResponse.redirect(new URL(`/${role}`, request.url));
+  }
+
+  const rolePaths: Record<string, string> = {
+    admin: '/admin',
+    purchasing: '/purchasing',
+    warehouse: '/warehouse',
+  };
+
+  for (const [role, route] of Object.entries(rolePaths)) {
+    if (pathname.startsWith(route) && session?.user?.role?.toLocaleLowerCase() !== role) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
   }
 
@@ -22,5 +36,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login'],
+  matcher: [
+    // '/dashboard/:path*',
+    '/login',
+    '/admin/:path*',
+    '/purchasing/:path*',
+    '/warehouse/:path*',
+  ],
 };

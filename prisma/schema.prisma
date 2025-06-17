@@ -9,15 +9,16 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
+// generator seed {
+//   provider = "prisma-seed"
+//   output   = "prisma/seed.ts"
+// }
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-generator seed {
-  provider = "prisma-seed"
-  output   = "prisma/seed.ts"
-}
 
 enum RoleName {
   Admin

@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { SignInButton } from '../button';
+import { LoginButton } from './formButton';
 import { signinCredentials } from '@/lib/actions';
 
-const FormSignIn = () => {
+const FormLogin = () => {
   const [state, formAction] = React.useActionState(signinCredentials, null);
 
   return (
@@ -43,9 +43,9 @@ const FormSignIn = () => {
           <span className=" mt-2 text-sm text-red-500 ">{state?.error?.password}</span>
         </div>
       </div>
-      <SignInButton />
+      <LoginButton />
     </form>
   );
 };
 
-export default FormSignIn;
+export default FormLogin;

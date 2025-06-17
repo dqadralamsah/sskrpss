@@ -2,7 +2,7 @@
 
 import { useFormStatus } from 'react-dom';
 
-export const SignInButton = () => {
+export const LoginButton = () => {
   const { pending } = useFormStatus();
 
   return (
