@@ -8,7 +8,7 @@ type Props = {
 export const NavButton = ({ isOpen, toggle }: Props) => {
   return (
     <>
-      <button onClick={toggle} aria-label="Toggle Menu" className="  p-2 cursor-pointer">
+      <button onClick={toggle} aria-label="Toggle Menu" className=" p-2 cursor-pointer">
         {isOpen ? (
           <ChevronLeft size={24} strokeWidth={3} />
         ) : (
