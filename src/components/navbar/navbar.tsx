@@ -1,12 +1,12 @@
+import { Session } from 'inspector/promises';
 import { HomeNavbar } from './navHome';
 import { SideNavbar } from './navMenu';
 
-const Navbar = () => {
+const Navbar = ({ session }: { session: any }) => {
   return (
     <>
       <nav>
-        <SideNavbar />
-        <HomeNavbar />
+        <SideNavbar session={session} />
       </nav>
     </>
   );

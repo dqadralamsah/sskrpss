@@ -14,12 +14,12 @@ export async function middleware(request: NextRequest) {
     Warehouse: '/warehouse',
   };
 
-  // Not Session and Not Login
+  // If the user is NOT logged in AND is trying to access a non-public route
   if (!session && !isPublic) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Logged In but user tries to access public pages => dierct to page role
+  //  If the user IS logged in BUT tries to access a public page
   if (session && isPublic) {
     const redirectPath = rolePaths[session.user.role];
 
@@ -30,6 +30,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
+  // Loop through each role to restrict access to its own path
   for (const [role, route] of Object.entries(rolePaths)) {
     if (pathname.startsWith(route) && session?.user?.role !== role) {
       return NextResponse.redirect(new URL('/unauthorized', request.url));

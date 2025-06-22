@@ -1,5 +1,6 @@
 import Navbar from '@/components/navbar/navbar';
 import { auth } from '@/lib/auth';
+import { SessionProvider } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -11,8 +12,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <Navbar />
-      <main>{children}</main>
+      <SessionProvider session={session}>
+        <Navbar session={session} />
+        <main>{children}</main>
+      </SessionProvider>
     </>
   );
 }
