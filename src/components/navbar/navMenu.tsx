@@ -1,7 +1,6 @@
 'use client';
 
 import { navMenuConfig } from '@/config/navConfig';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -15,9 +14,15 @@ const roleToKey: Record<string, keyof typeof navMenuConfig> = {
   Warehouse: 'warehouse',
 };
 
-export const SideNavbar = ({ session }: { session: any }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+export const SideNavbar = ({
+  session,
+  isOpen,
+  setIsOpen,
+}: {
+  session: any;
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
+}) => {
   const pathname = usePathname();
 
   const role = session?.user?.role;

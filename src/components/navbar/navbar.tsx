@@ -1,12 +1,18 @@
-import { Session } from 'inspector/promises';
-import { HomeNavbar } from './navHome';
 import { SideNavbar } from './navMenu';
 
-const Navbar = ({ session }: { session: any }) => {
+const Navbar = ({
+  session,
+  isOpen,
+  setIsOpen,
+}: {
+  session: any;
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
+}) => {
   return (
     <>
       <nav>
-        <SideNavbar session={session} />
+        <SideNavbar session={session} isOpen={isOpen} setIsOpen={setIsOpen} />
       </nav>
     </>
   );
