@@ -17,9 +17,7 @@ export default function NavbarWrapper({
       <div className=" flex">
         <Navbar session={session} isOpen={isOpen} setIsOpen={setIsOpen} />
         <main
-          className={`transition-all duration-500 ease-in-out w-full ${
-            isOpen ? 'mx-8' : 'mx-8'
-          } py-4`}
+          className={`transition-all duration-500 ease-in-out w-full ${isOpen ? 'mx-8' : 'mx-8'} `}
         >
           {children}
         </main>
