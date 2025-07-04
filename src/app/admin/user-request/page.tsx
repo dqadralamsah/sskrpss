@@ -1,5 +1,10 @@
 import CreateRequestPage from '@/app/features/user-request/CreateRequestPage';
 
 export default function Page() {
-  return <CreateRequestPage />;
+  return (
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Request</h1>
+      <CreateRequestPage />
+    </div>
+  );
 }

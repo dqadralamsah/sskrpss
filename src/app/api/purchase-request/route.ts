@@ -4,9 +4,8 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const session = await auth();
-  const role = session?.user?.role;
 
-  if (!role || !['Admin', 'Purchasing'].includes(role)) {
+  if (!session || !['Admin', 'Purchasing'].includes(session.user.role)) {
     return NextResponse.json([{ error: 'Unauthorized' }], { status: 403 });
   }
 

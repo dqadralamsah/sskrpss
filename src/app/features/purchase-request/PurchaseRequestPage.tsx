@@ -2,28 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { MoreVertical } from 'lucide-react';
-
-type PurchaseRequest = {
-  id: string;
-  status: string;
-  requestedBy: { name: string };
-  approvedBy: { name: string };
-  requestDate: string;
-  items: {
-    id: string;
-    quantity: number;
-    rawMaterial: { name: string };
-  }[];
-};
+import { PurchaseRequest } from './type';
+import TablePurhcaseRequest from './components/TablePurchaseRequest';
+import Pagination from './components/Pagination';
+import DetailDialog from './components/DetailDialog';
+import FilterBar from './components/FilterBar';
+import { DateRange } from 'react-day-picker';
 
 export default function PurchaseRequestPage() {
   const [requests, setRequests] = useState<PurchaseRequest[]>([]);
@@ -31,33 +17,59 @@ export default function PurchaseRequestPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isReviseOpen, setIsReviseOpen] = useState(false);
   const [revisionNote, setRevisionNote] = useState('');
+  const [filterStatus, setFilterStatus] = useState('ALL');
+  const [filterRequester, setFilterRequester] = useState('');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Filter Logic
+  const filteredRequests = requests.filter((r) => {
+    const matchStatus = filterStatus === 'ALL' || r.status === filterStatus;
+    const matchRequester = r.requestedBy.name.toLowerCase().includes(filterRequester.toLowerCase());
+
+    const createdAt = new Date(r.createdAt);
+    const matchDate =
+      !dateRange?.from ||
+      !dateRange?.to ||
+      (createdAt >= dateRange.from && createdAt <= dateRange.to);
+
+    return matchStatus && matchRequester && matchDate;
+  });
+
+  const itemsPerPage = 10;
+  const paginatedRequests = filteredRequests.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   useEffect(() => {
     fetch('/api/purchase-request')
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setRequests(data);
-        } else if (data?.error) {
-          alert('Anda tidak memiliki akses ke data ini.');
-        }
-      })
-      .catch(() => {
-        alert('Terjadi kesalahan saat memuat data.');
+        const sorted = data.sort((a: PurchaseRequest, b: PurchaseRequest) =>
+          b.id.localeCompare(a.id)
+        );
+        setRequests(sorted);
       });
   }, []);
 
+  // Refresh Data
+  const refreshData = () => {
+    fetch('/api/purchase-request')
+      .then((res) => res.json())
+      .then((data: PurchaseRequest[]) => {
+        const sorted = data.sort((a, b) => b.id.localeCompare(a.id));
+        setRequests(sorted);
+      });
+  };
+
+  // Open Detauil
   const openDetail = (req: PurchaseRequest) => {
     setSelectedRequest(req);
     setIsOpen(true);
   };
 
-  const refreshData = () => {
-    fetch('/api/purchase-request')
-      .then((res) => res.json())
-      .then((data) => setRequests(data));
-  };
-
+  // Handle Delete
   const handleDelete = async (id: string) => {
     const confirmed = confirm('Apakah anda yakin menghapus Purchase Request ini?');
     if (!confirmed) return;
@@ -78,168 +90,99 @@ export default function PurchaseRequestPage() {
     }
   };
 
+  // Handle Approve
   const handleApprove = async () => {
-    await fetch(`/api/purchase-request/${selectedRequest?.id}/approve`, {
-      method: 'POST',
+    if (!selectedRequest) return;
+
+    await fetch('/api/purchase-request/approve', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: selectedRequest.id }),
     });
+
     setIsOpen(false);
     refreshData();
   };
 
+  // Handle Reject
   const handleReject = async () => {
     if (!selectedRequest) return;
-    await fetch(`/api/purchase-request/${selectedRequest.id}/reject`, {
-      method: 'POST',
+
+    await fetch('/api/purchase-request/reject', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: selectedRequest.id }),
     });
+
     setIsOpen(false);
     refreshData();
   };
 
+  // Handle Revise
   const handleRevise = async () => {
     if (!selectedRequest || !revisionNote.trim()) return;
-    await fetch(`/api/purchase-request/${selectedRequest.id}/revise`, {
-      method: 'POST',
-      body: JSON.stringify({ revisionNote }),
+
+    await fetch('/api/purchase-request/revise', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: selectedRequest.id,
+        revisionNote: revisionNote.trim(),
+      }),
     });
+
     setIsReviseOpen(false);
     setIsOpen(false);
     setRevisionNote('');
     refreshData();
   };
 
+  const handlePrint = (req: PurchaseRequest) => {
+    setSelectedRequest(req);
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  };
+
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4">Purchase Requests</h1>
+    <div className="max-w-screen-xl space-y-6">
+      {/* FilterBar */}
+      <FilterBar
+        status={filterStatus}
+        onStatusChange={setFilterStatus}
+        requester={filterRequester}
+        onRequesterChange={setFilterRequester}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
+      />
 
-      <table className="w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
-        <thead className="bg-gray-100 text-gray-700">
-          <tr>
-            <th className="p-3 border w-10">
-              <input type="checkbox" />
-            </th>
-            <th className="p-3 border">ID</th>
-            <th className="p-3 border">Requester</th>
-            <th className="p-3 border">Approved By</th>
-            <th className="p-3 border">Status</th>
-            <th className="p-3 border">Date</th>
-            <th className="p-3 border text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {requests.map((req) => (
-            <tr key={req.id} className="hover:bg-gray-50">
-              <td className="p-3 border text-center">
-                <input type="checkbox" />
-              </td>
-              <td className="p-3 border text-xs font-mono text-gray-600">{req.id.slice(0, 9)}</td>
-              <td className="p-3 border">{req.requestedBy.name}</td>
-              <td className="p-3 border">{req.approvedBy?.name || '-'}</td>
-              <td className="p-3 border">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                    req.status === 'APPROVED'
-                      ? 'bg-green-100 text-green-700'
-                      : req.status === 'REJECTED'
-                      ? 'bg-red-100 text-red-700'
-                      : req.status === 'REVISION'
-                      ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {req.status}
-                </span>
-              </td>
-              <td className="p-3 border">{new Date(req.requestDate).toLocaleDateString()}</td>
-              <td className="p-3 border text-center">
-                {/* Diubah jadi Icon edit */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                      <MoreVertical size={16} />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => openDetail(req)}>Lihat</DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-red-600 focus:bg-red-50"
-                      onClick={() => handleDelete(req.id)}
-                    >
-                      Hapus
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Table */}
+      <TablePurhcaseRequest
+        requests={paginatedRequests}
+        onView={openDetail}
+        onDelete={handleDelete}
+        onPrint={handlePrint}
+      />
 
-      {/* ===== Modal Detail =====*/}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Detail Purchase Request</DialogTitle>
-          </DialogHeader>
-          {selectedRequest && (
-            <div className="space-y-2 text-sm">
-              <p>
-                <strong>ID:</strong> {selectedRequest.id}
-              </p>
-              <p>
-                <strong>Requester:</strong> {selectedRequest.requestedBy.name}
-              </p>
-              <p>
-                <strong>Approved By:</strong> {selectedRequest.approvedBy?.name || '-'}
-              </p>
-              <p>
-                <strong>Status:</strong> {selectedRequest.status}
-              </p>
-              <p>
-                <strong>Date:</strong> {new Date(selectedRequest.requestDate).toLocaleString()}
-              </p>
-              <div>
-                <strong>Items:</strong>
-                <ul className="list-disc list-inside">
-                  {selectedRequest.items.map((item) => (
-                    <li key={item.id}>
-                      {item.rawMaterial.name} — {item.quantity}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalItems={requests.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={setCurrentPage}
+      />
 
-              {/* Tombol aksi */}
-              <div className="flex justify-between pt-4">
-                {/* Tombol Revise */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsReviseOpen(true)}
-                  className="text-yellow-700 border-yellow-400 hover:bg-yellow-50"
-                >
-                  Revise
-                </Button>
+      {/* Modal Detail */}
+      <DetailDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        request={selectedRequest}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        onReviseOpen={() => setIsReviseOpen(true)}
+      />
 
-                {/* Tombol Approve/Reject */}
-                <div className="flex gap-2">
-                  {selectedRequest.status !== 'REJECTED' && (
-                    <Button variant="destructive" size="sm" onClick={handleReject}>
-                      Reject
-                    </Button>
-                  )}
-                  {selectedRequest.status !== 'APPROVED' && (
-                    <Button variant="default" size="sm" onClick={handleApprove}>
-                      Approve
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* ===== Modal Revisi ===== */}
+      {/* Modal Revisi */}
       <Dialog open={isReviseOpen} onOpenChange={setIsReviseOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>

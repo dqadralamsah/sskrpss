@@ -1,16 +1,16 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
 
 type Context = {
   params: { id: string };
 };
 
-export async function GET(_: Request, { params }: Context) {
+// GET /api/purchase-request/:id
+export async function GET(_: NextRequest, { params }: Context) {
   const session = await auth();
-  const role = session?.user?.role;
 
-  if (!role || !['admin', 'purchasing'].includes(role)) {
+  if (!session || !['Admin', 'Purchasing'].includes(session.user.role)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
@@ -35,16 +35,19 @@ export async function GET(_: Request, { params }: Context) {
   }
 }
 
-export async function DELETE(_: Request, { params }: Context) {
+// DELETE /api/purchase-request/:id
+export async function DELETE(_: NextRequest, { params }: Context) {
   const session = await auth();
-  const role = session?.user?.role;
 
-  if (!role || !['admin', 'purchasing'].includes(role)) {
+  if (!session || !['Admin', 'Purchasing'].includes(session.user.role)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
   try {
-    await prisma.purchaseRequest.delete({ where: { id: params.id } });
+    await prisma.purchaseRequest.delete({
+      where: { id: params.id },
+    });
+
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error('[PR_DETAIL_DELETE]', error);

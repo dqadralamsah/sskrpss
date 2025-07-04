@@ -22,8 +22,15 @@ export async function GET(req: NextRequest) {
             rawMaterial: true,
           },
         },
-        requestedBy: true,
-        approvedBy: true,
+        approvedBy: {
+          select: {
+            name: true,
+          },
+        },
+        PurchaseRequestRevisionLog: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -37,7 +44,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST
+// POST: Input Data Baru
 export async function POST(req: NextRequest) {
   const session = await auth();
   const userId = session?.user?.id;
