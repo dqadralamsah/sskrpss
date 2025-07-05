@@ -6,7 +6,7 @@ export const navMenuConfig = {
     { name: 'Request', href: '/admin/user-request', icon: FilePlus },
     { name: 'Purchase Request', href: '/admin/purchase-request', icon: CheckCircle },
     { name: 'Purchase Orders', href: '/admin/purchase-order', icon: ShoppingCart },
-    { name: 'Suppliers', href: '/admin/suppliers', icon: Truck },
+    { name: 'Suppliers', href: '/admin/supplier', icon: Truck },
     { name: 'Inventory', href: '/admin/inventory', icon: Boxes },
   ],
   purchasing: [

@@ -1,6 +1,8 @@
-import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { auth } from '@/lib/auth';
+import { generateNextId, generateNextIds } from '@/lib/id-generator';
 import { NextRequest, NextResponse } from 'next/server';
+import { id } from 'date-fns/locale';
 
 // GET: Ambil semua PR milik user
 export async function GET(req: NextRequest) {
@@ -61,16 +63,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Description and items are required' }, { status: 400 });
     }
 
+    // Generate ID untuk Purchase Request
+    const prId = await generateNextId('PRCHS', 'purchaseRequest', 'id');
+
+    // Generate ID unik untuk semua items
+    const itemIds = await generateNextIds('PRCHSITM', 'purchaseRequestItem', 'id', items.length);
+
+    const itemsWithId = await items.map(
+      (item: { rawMaterialId: string; quantity: number }, idx: number) => ({
+        id: itemIds[idx],
+        rawMaterialId: item.rawMaterialId,
+        quantity: item.quantity,
+      })
+    );
+
     const newRequest = await prisma.purchaseRequest.create({
       data: {
+        id: prId,
         requestedById: userId,
         description,
         status: 'SUBMITTED',
         items: {
-          create: items.map((item: { rawMaterialId: string; quantity: number }) => ({
-            rawMaterialId: item.rawMaterialId,
-            quantity: item.quantity,
-          })),
+          create: itemsWithId,
         },
       },
       include: {
