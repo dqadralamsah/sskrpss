@@ -6,7 +6,7 @@ export async function GET() {
   const session = await auth();
 
   if (!session || !['Admin', 'Purchasing'].includes(session.user.role)) {
-    return NextResponse.json([{ error: 'Unauthorized' }], { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
   try {
