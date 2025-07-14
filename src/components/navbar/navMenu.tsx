@@ -1,9 +1,8 @@
 'use client';
 
-import { navMenuConfig } from '@/config/navConfig';
 import Link from 'next/link';
+import { navMenuConfig } from '@/config/navConfig';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 import { NavButton } from './navButton';
 import Image from 'next/image';
 import navLogoImg from '@/../../public/logo1.png';
@@ -30,45 +29,42 @@ export const SideNavbar = ({
   const menu = navKey ? navMenuConfig[navKey] : [];
 
   return (
-    <nav
-      className={`h-dvh flex flex-col p-4 gap-4 shadow-2xl overflow-hidden ${
-        isOpen ? 'w-72' : 'w-[72px]'
-      } transition-[width] duration-700`}
+    <aside
+      className={`sticky top-0 h-screen flex flex-col p-4 shadow-xl overflow-hidden z-90 bg-white transition-[width] duration-500 ${
+        isOpen ? 'w-72' : 'w-[74px]'
+      }`}
     >
-      <div
-        className={`navMenuHeader relative w-full flex items-center justify-between py-2 border-b-2 border-gray-300 ${
-          isOpen ? '' : ''
-        }`}
-      >
+      <div className="relative w-full flex items-center justify-between py-2 my-2 border-b border-gray-300">
         <Image
           src={navLogoImg}
           alt="Logo"
-          className={`w-[150px] h-[33px] flex items-center m-1 object-cover transition-opacity duration-500 ${
-            isOpen ? '' : 'opacity-0'
+          className={`w-[150px] h-[33px] object-contain transition-opacity duration-500  ${
+            isOpen ? 'opacity-100' : 'opacity-0 w-0'
           }`}
         />
         <NavButton isOpen={isOpen} toggle={() => setIsOpen(!isOpen)} />
       </div>
-      <div className="navMenu flex flex-col gap-4">
+
+      <nav className="flex flex-col gap-4">
         {menu.map(({ name, href, icon: Icon }) => (
           <Link
             key={name}
             href={href}
-            className={`flex items-center p-2 gap-4 rounded-md transition-colors duration-300  whitespace-nowrap ${
-              pathname === href ? ' text-white bg-nds-purple1 hover:bg-none' : 'hover:bg-purple-200'
+            className={`flex items-center p-2 gap-4 rounded-md transition-colors duration-300 whitespace-nowrap ${
+              pathname === href ? 'bg-nds-purple1 text-white' : 'hover:bg-purple-200'
             }`}
           >
-            <Icon strokeWidth={1.5} className="w-[24px] h-[24px] flex-none" />
+            <Icon strokeWidth={1.5} size={24} className="flex-none" />
             <span
-              className={`flex items-center  text-[18px] font-medium transition-opacity duration-500 ${
-                isOpen ? '' : 'opacity-0'
+              className={`text-sm font-medium transition-opacity duration-300 ${
+                isOpen ? 'opacity-100' : 'opacity-0'
               }`}
             >
               {name}
             </span>
           </Link>
         ))}
-      </div>
-    </nav>
+      </nav>
+    </aside>
   );
 };

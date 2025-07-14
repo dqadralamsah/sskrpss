@@ -64,10 +64,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate ID untuk Purchase Request
-    const prId = await generateNextId('PRCHS', 'purchaseRequest', 'id');
+    const prId = await generateNextId('PRCRQ', 'purchaseRequest', 'id');
 
     // Generate ID unik untuk semua items
-    const itemIds = await generateNextIds('PRCHSITM', 'purchaseRequestItem', 'id', items.length);
+    const itemIds = await generateNextIds('PRITM', 'purchaseRequestItem', 'id', items.length);
 
     const itemsWithId = await items.map(
       (item: { rawMaterialId: string; quantity: number }, idx: number) => ({

@@ -1,12 +1,17 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
+* {
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+}
 
 @theme {
   --color-nds-purple1: #9d15f8;
   --color-nds-purple2: #850ad6;
 }
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

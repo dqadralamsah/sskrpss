@@ -53,8 +53,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const poId = await generateNextId('PRCHSRDR', 'purchaseOrder', 'id');
-    const itemIds = await generateNextIds('POITMRDR', 'purchaseOrderItem', 'id', items.length);
+    const poId = await generateNextId('PRCOR', 'purchaseOrder', 'id');
+    const itemIds = await generateNextIds('POITM', 'purchaseOrderItem', 'id', items.length);
 
     const filteredItems = items.filter((item: any) => item.rawMaterialId);
 

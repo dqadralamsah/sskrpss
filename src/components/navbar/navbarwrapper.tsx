@@ -1,7 +1,7 @@
 'use client';
 
-import Navbar from '@/components/navbar/navbar';
 import { useState } from 'react';
+import { SideNavbar } from './navMenu';
 
 export default function NavbarWrapper({
   children,
@@ -13,15 +13,9 @@ export default function NavbarWrapper({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>
-      <div className=" flex">
-        <Navbar session={session} isOpen={isOpen} setIsOpen={setIsOpen} />
-        <main
-          className={`transition-all duration-500 ease-in-out w-full ${isOpen ? 'mx-8' : 'mx-8'} `}
-        >
-          {children}
-        </main>
-      </div>
-    </>
+    <div className="flex h-screen overflow-hidden">
+      <SideNavbar session={session} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <main className="flex-1 mx-2 overflow-y-auto">{children}</main>
+    </div>
   );
 }
