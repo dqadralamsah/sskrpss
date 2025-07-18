@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function PaginationBar({ currentPage, totalPages, onPageChange }: Props) {
-  if (totalPages <= 1) return null;
+  if (!totalPages) return null;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 

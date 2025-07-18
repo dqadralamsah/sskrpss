@@ -9,12 +9,13 @@ type Params = {
 // GET /api/raw-material/[id]
 export async function GET(req: NextRequest, { params }: Params) {
   const session = await auth();
-  console.log('SESSION DARI POSTMAN:', session);
-  const { id } = await params;
 
   if (!session || !['Admin', 'Purchasing', 'Warehouse'].includes(session.user.role)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 403 });
   }
+
+  const { id } = await params;
+
   try {
     const material = await prisma.rawMaterial.findUnique({
       where: { id },
@@ -47,7 +48,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       })),
     };
 
-    return NextResponse.json({ data: formatted });
+    return NextResponse.json(formatted);
   } catch (error) {
     console.error('[GET_RAW_MATERIAL_BY_ID]', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

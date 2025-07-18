@@ -101,6 +101,7 @@ export default function RawMaterialTable({ data, loading }: Props) {
                         <DropdownMenuItem asChild>
                           <Link href={`/admin/inventory/${item.id}`}>Lihat</Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem>Tambah Mutasi</DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/admin/inventory/${item.id}/edit`}>Edit</Link>
                         </DropdownMenuItem>

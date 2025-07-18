@@ -13,17 +13,19 @@ export default function EditInventoryPage() {
   const [initialData, setInitialData] = useState<any | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
+  const [shouldRefetch, setShouldRefetch] = useState(false);
 
   useEffect(() => {
     if (!id) return;
-
     setLoading(true);
 
     Promise.all([
       fetch(`/api/raw-material/${id}`).then((res) => res.json()),
       fetch(`/api/supplier`).then((res) => res.json()),
     ])
-      .then(([material, supplierList]) => {
+      .then(([res, supplierList]) => {
+        const material = res;
+
         const formatted: RawMaterialFormData = {
           name: material.name,
           description: material.description,
@@ -31,7 +33,7 @@ export default function EditInventoryPage() {
           minStock: material.minStock,
           maxStock: material.maxStock,
           safetyStock: material.safetyStock,
-          suppliers: material.suppliers.map((s: any) => ({
+          suppliers: (material.suppliers ?? []).map((s: any) => ({
             supplierId: s.id,
             price: s.price,
             minOrder: s.minOrder,
@@ -40,6 +42,9 @@ export default function EditInventoryPage() {
 
         setInitialData(formatted);
         setSuppliers(supplierList);
+      })
+      .catch((error) => {
+        console.error('[FETCH_EDIT_RAW_MATERIAL]', error);
       })
       .finally(() => setLoading(false));
   }, [id]);
@@ -65,13 +70,11 @@ export default function EditInventoryPage() {
     }
   };
 
-  if (!initialData) {
-    return <p className="p-4 text-sm text-muted-foreground">Memuat data bahan baku...</p>;
-  }
+  if (!initialData) return <div>Loading...</div>;
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-4">Edit Bahan Baku</h1>
+      {/* RawMaterial Section */}
       <RawMaterialForm
         onSubmit={handleUpdate}
         loading={loading}

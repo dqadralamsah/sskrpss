@@ -30,7 +30,7 @@ export const SideNavbar = ({
 
   return (
     <aside
-      className={`sticky top-0 h-screen flex flex-col p-4 shadow-xl overflow-hidden z-90 bg-white transition-[width] duration-500 ${
+      className={`sticky top-0 h-screen flex flex-col p-4 shadow-xl overflow-hidden z-45 bg-white transition-[width] duration-500 ${
         isOpen ? 'w-72' : 'w-[74px]'
       }`}
     >

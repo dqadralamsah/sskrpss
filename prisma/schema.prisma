@@ -193,7 +193,7 @@ enum MutationType {
   OUT
 }
 
-enum SourceType {
+enum SourceType { 
   PO
   MANUAL
   USAGE
@@ -211,4 +211,3 @@ model StockMutation {
   description   String?
   createdAt     DateTime     @default(now())
 }
-

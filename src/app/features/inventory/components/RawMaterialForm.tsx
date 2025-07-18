@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2 } from 'lucide-react';
-import SupplierCombobox from '@/components/ui/comboboxs/SuplierCombobox';
 import { RawMaterialFormData } from '@/types/raw-material';
+import SupplierCombobox from '@/components/ui/comboboxs/SuplierCombobox';
 
 // Tambahkan props
 type Props = {
@@ -76,6 +76,7 @@ export default function RawMaterialForm({ onSubmit, loading, suppliers, initialD
             />
           </div>
 
+          {/* Stock Detail */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
             <div>
               <label className="font-medium">Satuan</label>
@@ -123,60 +124,70 @@ export default function RawMaterialForm({ onSubmit, loading, suppliers, initialD
         </div>
       </div>
 
+      {/* Supplier Section */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">Supplier</h3>
-          <Button type="button" onClick={handleAddItem} size="sm">
-            <Plus className="w-4 h-4 mr-1" /> Tambah Supplier
+          <Button type="button" variant={'ndsbutton'} onClick={handleAddItem} size="sm">
+            <Plus size={16} /> Add Supplier
           </Button>
         </div>
 
-        {items.map((item, i) => (
-          <div key={i} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-end">
-            <SupplierCombobox
-              suppliers={suppliers}
-              value={item.supplierId}
-              onChange={(val) => {
-                const updated = [...items];
-                updated[i].supplierId = val;
-                setItems(updated);
-              }}
-            />
-            <Input
-              type="number"
-              placeholder="Harga"
-              value={item.price}
-              onChange={(e) => {
-                const updated = [...items];
-                updated[i].price = e.target.value;
-                setItems(updated);
-              }}
-            />
-            <Input
-              type="number"
-              placeholder="Min Order"
-              value={item.minOrder}
-              onChange={(e) => {
-                const updated = [...items];
-                updated[i].minOrder = e.target.value;
-                setItems(updated);
-              }}
-            />
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              onClick={() => handleRemoveItem(i)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+        <div className="space-y-2">
+          {/* Label Kolom */}
+          <div className="grid grid-cols-4 gap-2 text-sm text-muted-foreground">
+            <span>Supplier</span>
+            <span>Harga</span>
+            <span>Min Order</span>
           </div>
-        ))}
+
+          {items.map((item, i) => (
+            <div key={i} className="grid grid-cols-1 gap-2  md:grid-cols-4 ">
+              <SupplierCombobox
+                suppliers={suppliers}
+                value={item.supplierId}
+                onChange={(val) => {
+                  const updated = [...items];
+                  updated[i].supplierId = val;
+                  setItems(updated);
+                }}
+              />
+              <Input
+                type="number"
+                placeholder="Harga"
+                value={item.price}
+                onChange={(e) => {
+                  const updated = [...items];
+                  updated[i].price = e.target.value;
+                  setItems(updated);
+                }}
+              />
+              <Input
+                type="number"
+                placeholder="Min Order"
+                value={item.minOrder}
+                onChange={(e) => {
+                  const updated = [...items];
+                  updated[i].minOrder = e.target.value;
+                  setItems(updated);
+                }}
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                onClick={() => handleRemoveItem(i)}
+              >
+                <Trash2 size={16} />
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex justify-end">
-        <Button type="button" onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Menyimpan...' : initialData ? 'Perbarui Bahan Baku' : 'Simpan Bahan Baku'}
+        <Button type="button" variant={'ndsbutton'} onClick={handleSubmit} disabled={loading}>
+          {loading ? 'Save Progress...' : initialData ? 'Save' : 'Add New Material'}
         </Button>
       </div>
     </div>
