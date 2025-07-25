@@ -14,9 +14,11 @@ export async function GET(_: NextRequest, { params }: Context) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
+  const { id } = await params;
+
   try {
     const request = await prisma.purchaseRequest.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         items: { include: { rawMaterial: true } },
         requestedBy: true,

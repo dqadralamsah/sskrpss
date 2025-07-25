@@ -1,7 +1,8 @@
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
-import { stockMutationSchema } from '@/app/features/inventory/schema';
 import { NextRequest, NextResponse } from 'next/server';
+import { generateNextId } from '@/lib/id-generator';
+import { stockMutationSchema } from '@/app/features/inventory/schema';
 
 // GET
 export async function GET(req: NextRequest) {
@@ -27,6 +28,11 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
+        include: {
+          purchaseOrder: {
+            include: { supplier: true },
+          },
+        },
       }),
       prisma.stockMutation.count({
         where: { rawMaterialId },
@@ -45,7 +51,7 @@ export async function GET(req: NextRequest) {
 // POST
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session || !['Admin', 'Purhcasing', 'Warehouse'].includes(session.user.role)) {
+  if (!session || !['Admin', 'Purchasing', 'Warehouse'].includes(session.user.role)) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
@@ -60,18 +66,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { rawMaterialId, type, sourceType, quantity, description } = parsed.data;
+    const { rawMaterialId, type, sourceType, sourceId, quantity, description } = parsed.data;
+
+    const id = await generateNextId('STMTN', 'stockMutation', 'id');
 
     // Transaction: Create mutation + Update stok
     const mutation = await prisma.$transaction(async (tx) => {
       // 1. Create mutation
       const record = await tx.stockMutation.create({
         data: {
+          id,
           rawMaterialId,
           type,
           sourceType,
+          sourceId: sourceId ?? null,
           quantity,
           description: description ?? null,
+          createdById: session.user.id,
         },
       });
 

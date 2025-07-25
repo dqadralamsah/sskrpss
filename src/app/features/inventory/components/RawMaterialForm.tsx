@@ -1,23 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { Supplier } from '@/types/supplier';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2 } from 'lucide-react';
 import { RawMaterialFormData } from '@/types/raw-material';
-import SupplierCombobox from '@/components/ui/comboboxs/SuplierCombobox';
+import SupplierCombobox from '@/components/ui/comboboxs/SupplierCombobox';
 
 // Tambahkan props
 type Props = {
   onSubmit: (data: RawMaterialFormData) => Promise<void>;
   loading: boolean;
-  suppliers: Supplier[];
   initialData?: RawMaterialFormData;
 };
 
-export default function RawMaterialForm({ onSubmit, loading, suppliers, initialData }: Props) {
+export default function RawMaterialForm({ onSubmit, loading, initialData }: Props) {
   const [name, setName] = useState(initialData?.name ?? '');
   const [description, setDescription] = useState(initialData?.description ?? '');
   const [unit, setUnit] = useState(initialData?.unit ?? '');
@@ -144,7 +142,6 @@ export default function RawMaterialForm({ onSubmit, loading, suppliers, initialD
           {items.map((item, i) => (
             <div key={i} className="grid grid-cols-1 gap-2  md:grid-cols-4 ">
               <SupplierCombobox
-                suppliers={suppliers}
                 value={item.supplierId}
                 onChange={(val) => {
                   const updated = [...items];

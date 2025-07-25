@@ -2,13 +2,13 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ApprovedPR } from '../types';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ApprovedPurchaseRequest } from '../types';
 
 export default function PurcahseRequestApproveTable() {
-  const [data, setData] = useState<ApprovedPR[]>([]);
+  const [data, setData] = useState<ApprovedPurchaseRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

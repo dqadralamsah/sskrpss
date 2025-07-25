@@ -107,7 +107,7 @@ export default function PurchaseOrderTable() {
                         <MoreVertical size={16} />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="center">
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/purchase-order/${po.id}`}>Lihat</Link>
                       </DropdownMenuItem>

@@ -48,6 +48,8 @@ model User {
   purchaseRequest PurchaseRequest[] @relation("RequestBy")
   purchaseApprove PurchaseRequest[] @relation("ApprovedBy")
   purchaseRevision PurchaseRequestRevisionLog[]
+  stockMutations  StockMutation[]
+  recivedBy       PurchaseOrderItem[]
 }
 
 // Model Raw Material
@@ -108,11 +110,14 @@ model PurchaseOrder {
   supplierId  String
   createdBy   User @relation(fields: [createdById], references: [id], onDelete: Restrict)
   createdById String
-  orderDate   DateTime @default(now())
+  estimatedDate   DateTime @default(now())
   orderNotes  String?
   status      PurchaseOrderStatus @default(PENDING)
   items       PurchaseOrderItem[]
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+
+  stockMutations StockMutation[] @relation("PurchaseOrderToStockMutation")
 }
 
 // Enum untuk Status Item di Purchase Order
@@ -136,7 +141,10 @@ model PurchaseOrderItem {
   receivedQty           Int @default(0)
   receivedDate          DateTime?
   createdAt             DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 
+  receivedBy   User? @relation(fields: [receivedById], references: [id])
+  receivedById String?
   purchaseRequestItem   PurchaseRequestItem?  @relation(fields: [purchaseRequestItemId], references: [id], onDelete: SetNull)
   purchaseRequestItemId String?
 }
@@ -207,7 +215,12 @@ model StockMutation {
   rawMaterialId String
   type          MutationType
   sourceType    SourceType
+  sourceId      String?
   quantity      Int
   description   String?
   createdAt     DateTime     @default(now())
+  createdBy     User         @relation(fields: [createdById], references: [id])
+  createdById   String
+
+  purchaseOrder PurchaseOrder? @relation("PurchaseOrderToStockMutation", fields: [sourceId], references: [id])
 }

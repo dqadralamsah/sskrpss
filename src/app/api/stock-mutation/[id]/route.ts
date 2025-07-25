@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const id = await params.id;
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
@@ -34,6 +34,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
     if (!existing) {
       return NextResponse.json({ error: 'Mutation not found' }, { status: 404 });
+    }
+
+    if (existing.sourceType !== 'MANUAL') {
+      return NextResponse.json({ error: 'Only manual mutations can be edited' }, { status: 400 });
     }
 
     // Hitung selisih quantity lama dan baru
@@ -73,7 +77,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const id = await params.id;
+  const { id } = await params;
 
   try {
     const mutation = await prisma.stockMutation.findUnique({

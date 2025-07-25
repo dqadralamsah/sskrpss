@@ -8,6 +8,7 @@ export const stockMutationSchema = z.object({
   sourceType: z.enum(['PO', 'MANUAL', 'USAGE', 'OPNAME'], {
     required_error: 'Sumber mutasi wajib diisi',
   }),
+  sourceId: z.string().optional(),
   quantity: z
     .number({
       required_error: 'Jumlah wajib diisi',

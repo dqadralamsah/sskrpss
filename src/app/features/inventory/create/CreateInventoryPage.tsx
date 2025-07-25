@@ -1,23 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Supplier } from '@/types/supplier';
 import { RawMaterialFormData } from '@/types/raw-material';
 import RawMaterialForm from '../components/RawMaterialForm';
 
 export default function CreateInventoryPage() {
   const router = useRouter();
 
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetch(`/api/supplier`)
-      .then((res) => res.json())
-      .then((data) => setSuppliers(data))
-      .catch((err) => console.error('Failed to fecth data supplier', err));
-  });
 
   const handleCreate = async (data: RawMaterialFormData) => {
     setLoading(true);
@@ -41,7 +32,7 @@ export default function CreateInventoryPage() {
 
   return (
     <div>
-      <RawMaterialForm onSubmit={handleCreate} loading={loading} suppliers={suppliers} />
+      <RawMaterialForm onSubmit={handleCreate} loading={loading} />
     </div>
   );
 }
