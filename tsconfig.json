@@ -29,7 +29,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/features/purchase-request/components/TablePurchaseRequesttsx",
-    "src/app/features/user-request/components/Table.Requesttsx"
+    "src/app/features/user-request/components/Table.Requesttsx",
+    "src/app/api/dashboard/purchasing/statistics"
   ],
   "exclude": ["node_modules"]
 }

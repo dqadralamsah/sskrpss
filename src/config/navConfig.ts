@@ -11,9 +11,9 @@ export const navMenuConfig = {
   ],
   purchasing: [
     { name: 'Dashboard', href: '/purchasing', icon: Home },
-    { name: 'Purchase Request', href: '/purchasing/purchasereq', icon: CheckCircle },
-    { name: 'Purchase Orders', href: '/purchasing/purchaseord', icon: ShoppingCart },
-    { name: 'Suppliers', href: '/purchasing/suppliers', icon: Truck },
+    { name: 'Purchase Request', href: '/purchasing/purchase-request', icon: CheckCircle },
+    { name: 'Purchase Orders', href: '/purchasing/purchase-order', icon: ShoppingCart },
+    { name: 'Suppliers', href: '/purchasing/supplier', icon: Truck },
     { name: 'Inventory', href: '/purchasing/inventory', icon: Boxes },
   ],
   warehouse: [

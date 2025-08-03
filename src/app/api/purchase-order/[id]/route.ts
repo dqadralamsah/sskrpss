@@ -50,6 +50,7 @@ export async function GET(_: NextRequest, { params }: Params) {
   }
 }
 
+// PUT
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session || !['Admin', 'Purchasing'].includes(session.user.role)) {

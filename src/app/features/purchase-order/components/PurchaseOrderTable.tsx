@@ -1,5 +1,6 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { PurchaseOrder } from '../types';
 import Link from 'next/link';
@@ -15,6 +16,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function PurchaseOrderTable() {
   const [data, setData] = useState<PurchaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { data: session } = useSession();
+  const rolePath = session?.user?.role?.toLowerCase();
 
   useEffect(() => {
     fetch('/api/purchase-order')
@@ -109,12 +113,12 @@ export default function PurchaseOrderTable() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="center">
                       <DropdownMenuItem asChild>
-                        <Link href={`/admin/purchase-order/${po.id}`}>Lihat</Link>
+                        <Link href={`/${rolePath}/purchase-order/${po.id}`}>Lihat</Link>
                       </DropdownMenuItem>
                       {po.status === 'PENDING' && (
                         <>
                           <DropdownMenuItem asChild>
-                            <Link href={`/admin/purchase-order/${po.id}/edit`}>Edit</Link>
+                            <Link href={`/${rolePath}/purchase-order/${po.id}/edit`}>Edit</Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleDelete(po.id)}>
                             Hapus

@@ -1,16 +1,13 @@
-import { auth } from '@/lib/auth';
+// import { auth } from '@/lib/auth';
+import AdminDashboard from '@/app/features/dashboard/admin/AdminDashboardPage';
 
 export default async function AdminPage() {
-  const session = await auth();
+  // const session = await auth();
 
   return (
-    <div className=" p-4">
-      <h1>Hallo Ini Halaman Admin</h1>
-      <h2 className=" text-xl">
-        Welcome Back: <span className=" font-bold">{session?.user?.name}</span>
-      </h2>
-      <br />
-      <p>{JSON.stringify(session)}</p>
+    <div className="px-6 py-8 space-y-6 ">
+      <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+      <AdminDashboard />
     </div>
   );
 }
