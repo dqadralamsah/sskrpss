@@ -55,7 +55,7 @@ export default function CreateDialog({ rawMaterials, onSuccess, initialData, onC
 
     const payload = { description, items };
     const res = await fetch(
-      isRevision ? `/api/purchase-request/${initialData?.id}` : '/api/purchase-request/user',
+      isRevision ? `/api/purchase-request/revise/${initialData?.id}` : '/api/purchase-request/user',
       {
         method: isRevision ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -1,9 +1,9 @@
-import Navbar from '@/components/navbar/navbar';
 import { auth } from '@/lib/auth';
 import { SessionProvider } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import NavbarWrapper from '@/components/navbar/navbarwrapper';
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function WarehouseLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
 
   if (!session || session.user.role !== 'Warehouse') {
@@ -13,8 +13,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <>
       <SessionProvider session={session}>
-        <Navbar session={session} />
-        <main>{children}</main>
+        <NavbarWrapper session={session}>
+          <main>{children}</main>
+        </NavbarWrapper>
       </SessionProvider>
     </>
   );

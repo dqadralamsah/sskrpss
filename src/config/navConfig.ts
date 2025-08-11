@@ -1,4 +1,13 @@
-import { Home, CheckCircle, ShoppingCart, Truck, Boxes, FilePlus } from 'lucide-react';
+import {
+  Home,
+  CheckCircle,
+  ShoppingCart,
+  Truck,
+  Boxes,
+  FilePlus,
+  User,
+  UserPlus,
+} from 'lucide-react';
 
 export const navMenuConfig = {
   admin: [
@@ -8,6 +17,8 @@ export const navMenuConfig = {
     { name: 'Purchase Orders', href: '/admin/purchase-order', icon: ShoppingCart },
     { name: 'Suppliers', href: '/admin/supplier', icon: Truck },
     { name: 'Inventory', href: '/admin/inventory', icon: Boxes },
+    { name: 'Account', href: '/admin/account', icon: User },
+    { name: 'Create User', href: '/admin/users/new', icon: UserPlus },
   ],
   purchasing: [
     { name: 'Dashboard', href: '/purchasing', icon: Home },
@@ -18,7 +29,7 @@ export const navMenuConfig = {
   ],
   warehouse: [
     { name: 'Dashboard', href: '/warehouse', icon: Home },
-    { name: 'Request', href: '/warehouse/request', icon: FilePlus },
+    { name: 'Request', href: '/warehouse/user-request', icon: FilePlus },
     { name: 'Inventory', href: '/warehouse/inventory', icon: Boxes },
   ],
 };

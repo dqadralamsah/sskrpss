@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { RawMaterial } from '@/types/raw-material';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -40,6 +41,9 @@ function getStatusColor(status: StockStatus) {
 }
 
 export default function RawMaterialTable({ data, loading }: Props) {
+  const { data: session } = useSession();
+  const rolePath = session?.user?.role?.toLowerCase();
+
   return (
     <div className="border rounded-lg overflow-x-auto">
       <table className="w-full text-sm">
@@ -99,11 +103,11 @@ export default function RawMaterialTable({ data, loading }: Props) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="center">
                         <DropdownMenuItem asChild>
-                          <Link href={`/admin/inventory/${item.id}`}>Lihat</Link>
+                          <Link href={`/${rolePath}/inventory/${item.id}`}>Lihat</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>Tambah Mutasi</DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href={`/admin/inventory/${item.id}/edit`}>Edit</Link>
+                          <Link href={`/${rolePath}/inventory/${item.id}/edit`}>Edit</Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
