@@ -17,14 +17,24 @@ export default function CreateMutationDialog({ rawMaterialId, open, onOpenChange
   const handleSubmit = async (data: StockMutationFormData) => {
     setLoading(true);
     try {
-      await fetch('/api/stock-mutation', {
+      const res = await fetch('/api/stock-mutation', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
       });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert(result.error || result.message || 'Gagal menambahkan mutasi');
+        return;
+      }
+
+      // sukses
       onOpenChange(false);
     } catch (err) {
       console.error(err);
+      alert('Terjadi kesalahan saat membuat mutasi.');
     } finally {
       setLoading(false);
     }

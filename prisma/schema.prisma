@@ -29,7 +29,7 @@ enum RoleName {
 // Model Role
 model Role {
   id        String @id @default(uuid())
-  name      RoleName
+  name      RoleName @unique
   users     User[]
   createdAt DateTime @default(now())
 }

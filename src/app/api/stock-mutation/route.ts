@@ -29,14 +29,10 @@ export async function GET(req: NextRequest) {
         skip,
         take: limit,
         include: {
-          purchaseOrder: {
-            include: { supplier: true },
-          },
+          purchaseOrder: { include: { supplier: true } },
         },
       }),
-      prisma.stockMutation.count({
-        where: { rawMaterialId },
-      }),
+      prisma.stockMutation.count({ where: { rawMaterialId } }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -67,12 +63,25 @@ export async function POST(req: NextRequest) {
     }
 
     const { rawMaterialId, type, sourceType, sourceId, quantity, description } = parsed.data;
-
     const id = await generateNextId('STMTN', 'stockMutation', 'id');
 
-    // Transaction: Create mutation + Update stok
     const mutation = await prisma.$transaction(async (tx) => {
-      // 1. Create mutation
+      // 1. Ambil stok saat ini
+      const material = await tx.rawMaterial.findUnique({
+        where: { id: rawMaterialId },
+        select: { stock: true },
+      });
+
+      if (!material) {
+        throw new Error('Material not found');
+      }
+
+      // 2. Validasi agar stok tidak minus untuk OUT
+      if (type === 'OUT' && material.stock < quantity && sourceType !== 'OPNAME') {
+        throw new Error('Jumlah barang keluar melebihi stok tersedia');
+      }
+
+      // 3. Create mutation
       const record = await tx.stockMutation.create({
         data: {
           id,
@@ -86,15 +95,14 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // 2. Update stock based on sourceType
+      // 4. Update stok
       if (sourceType === 'OPNAME') {
-        // Replace total stock (e.g. stock take OPNAME)
+        // replace total stock
         await tx.rawMaterial.update({
           where: { id: rawMaterialId },
           data: { stock: quantity },
         });
       } else {
-        // Tambah atau Kurangi
         await tx.rawMaterial.update({
           where: { id: rawMaterialId },
           data: {
@@ -112,8 +120,11 @@ export async function POST(req: NextRequest) {
       { message: 'Stock mutation recorded', data: mutation },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('[STOCK_MUTATION_POST]', error);
-    return NextResponse.json({ error: 'Failed to record Stock mutation' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Failed to record Stock mutation' },
+      { status: 400 }
+    );
   }
 }

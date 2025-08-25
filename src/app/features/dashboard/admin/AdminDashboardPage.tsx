@@ -1,65 +1,84 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { StatCards } from '../components/StatCards';
-import { PrPoBarChart } from '../components/PrPoBarChart';
-import { RecentTable } from '../components/RecentTable';
+import { SummaryCards } from './components/SummaryCards';
+import { StockMutationChart } from './components/StockMutationChart';
+import { PurchaseRequestChart } from './components/PurchaseRequestChart';
+import { PurchaseOrderChart } from './components/PurchaseOrderChart';
+import { RecentActivity } from './components/RecentActivity';
+import { DateRangePicker } from './components/DateRangeFilter';
+import { DateRange } from 'react-day-picker';
 
-type Summary = {
-  totalPurchaseRequests: number;
-  totalPurchaseOrders: number;
-  totalRawMaterials: number;
-  totalStockMutations: number;
-};
+export function AdminDashboard() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-type ChartItem = {
-  month: string;
-  prCount: number;
-  poCount: number;
-};
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    to: new Date(),
+  });
 
-type RecentPR = {
-  id: string;
-  createdAt: string;
-  status: string;
-};
+  // fetch dashboard data berdasarkan range
+  async function fetchData(range: DateRange | undefined) {
+    if (!range?.from || !range.to) return;
+    setLoading(true);
 
-type RecentPO = {
-  id: string;
-  createdAt: string;
-  status: string;
-  supplierName: string;
-};
+    const start = range.from.toISOString().split('T')[0];
+    const end = range.to.toISOString().split('T')[0];
 
-export default function AdminDashboard() {
-  const [summary, setSummary] = useState<Summary | null>(null);
-  const [chartData, setChartData] = useState<ChartItem[]>([]);
-  const [recentPRs, setRecentPRs] = useState<RecentPR[]>([]);
-  const [recentPOs, setRecentPOs] = useState<RecentPO[]>([]);
+    try {
+      const res = await fetch(`/api/dashboard/admin?start=${start}&end=${end}`);
+      const json = await res.json();
+      setData(json);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      setData(null);
+    }
+    setLoading(false);
+  }
 
   useEffect(() => {
-    fetch('/api/dashboard/admin/summary')
-      .then((res) => res.json())
-      .then(setSummary);
-    fetch('/api/dashboard/admin/chart')
-      .then((res) => res.json())
-      .then((data) => setChartData(data.data));
-    fetch('/api/dashboard/admin/recent')
-      .then((res) => res.json())
-      .then((data) => {
-        setRecentPRs(data.recentPRs);
-        setRecentPOs(data.recentPOs);
-      });
-  }, []);
+    fetchData(dateRange);
+  }, [dateRange]);
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-96">
+        <span className="text-gray-500">Loading...</span>
+      </div>
+    );
+
+  if (!data)
+    return (
+      <div className="flex justify-center items-center h-96">
+        <span className="text-red-500">Failed to load dashboard data.</span>
+      </div>
+    );
 
   return (
-    <div className="space-y-6 ">
-      <StatCards summary={summary} />
-      <PrPoBarChart data={chartData} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <RecentTable title="PR Terbaru" data={recentPRs} />
-        <RecentTable title="PO Terbaru" data={recentPOs} showSupplier />
+    <div className="space-y-6">
+      {/* Date Filter */}
+      <div className="flex items-center justify-end gap-4">
+        <DateRangePicker date={dateRange} setDate={setDateRange} />
       </div>
+
+      {/* Summary Cards */}
+      <SummaryCards
+        purchaseRequests={data.summary.purchaseRequests}
+        purchaseOrders={data.summary.purchaseOrders}
+        stock={data.summary.stock}
+      />
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <PurchaseRequestChart data={data.chart.purchaseRequests} />
+        <PurchaseOrderChart data={data.chart.purchaseOrders} />
+      </div>
+
+      <StockMutationChart data={data.chart.stockMutation} />
+
+      {/* Recent Activity Tables */}
+      <RecentActivity data={data.recent} />
     </div>
   );
 }

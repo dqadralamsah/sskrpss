@@ -8,6 +8,7 @@ export type PurchaseRequestItem = {
   id: string;
   quantity: number;
   rawMaterial: RawMaterial;
+  unit: string;
 };
 
 export type PurchaseRequest = {

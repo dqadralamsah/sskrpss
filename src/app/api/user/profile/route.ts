@@ -1,11 +1,9 @@
-// pages/api/user/profile.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '@/lib/prisma'; // sesuaikan path prisma client kamu
-import { getSession } from '@/lib/auth'; // misal pakai session auth middleware
+import prisma from '@/lib/prisma';
+import { auth } from '@/lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getSession(req);
-
+  const session = await auth();
   if (!session) return res.status(401).json({ message: 'Unauthorized' });
 
   const userId = session.user.id;
@@ -18,13 +16,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       id: user.id,
       name: user.name,
       email: user.email,
-      // field lain sesuai model
+      // tambahkan field lain sesuai kebutuhan
     });
   }
 
   if (req.method === 'PUT') {
     const { name, email } = req.body;
-    // validasi sederhana bisa ditambah
+
+    if (!name || !email) {
+      return res.status(400).json({ message: 'Name and email are required' });
+    }
 
     try {
       const updatedUser = await prisma.user.update({

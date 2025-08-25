@@ -1,5 +1,4 @@
-// import { auth } from '@/lib/auth';
-import AdminDashboard from '@/app/features/dashboard/admin/AdminDashboardPage';
+import { AdminDashboard } from '../features/dashboard/admin/AdminDashboardPage';
 
 export default async function AdminPage() {
   // const session = await auth();
